@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GridZero</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #111319; overflow: hidden; }
+      #game { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; background: #111319; outline: none; }
+      #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                 gap: 18px; color: #e8e9ee; font: 15px/1.5 system-ui, "Segoe UI", "Leelawadee UI", Tahoma, sans-serif; }
+      #loading h1 { margin: 0; font-size: 44px; letter-spacing: 2px; font-weight: 700; }
+      #bar { width: 320px; height: 6px; background: #262a35; border-radius: 3px; overflow: hidden; }
+      #fill { width: 0; height: 100%; background: #ff7a1a; transition: width .2s; }
+      #note { color: #8a8f9c; font-size: 13px; text-align: center; }
+      #error { color: #ff6b6b; max-width: 560px; text-align: center; display: none; }
+    </style>
+  </head>
+  <body>
+    <canvas id="game" tabindex="-1"></canvas>
+    <div id="loading">
+      <h1>GRID ZERO</h1>
+      <div id="bar"><div id="fill"></div></div>
+      <div id="note">กำลังโหลดเกม (ครั้งแรกประมาณ 8 MB) · Loading the game (about 8 MB the first time)<br>
+        เซฟเก็บไว้ในเบราว์เซอร์เครื่องนี้ · Saves are kept in this browser</div>
+      <div id="error"></div>
+    </div>
+    <script>
+      var canvas = document.getElementById("game");
+      var config = {
+        arguments: [],
+        dataUrl: "Build/Web.data.unityweb",
+        frameworkUrl: "Build/Web.framework.js.unityweb",
+        codeUrl: "Build/Web.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "D2theOME",
+        productName: "GridZero",
+        productVersion: "1.0",
+        autoSyncPersistentDataPath: true,   // saves survive closing the tab (the game also flushes after each save)
+        showBanner: function (msg, type) { if (type === "error") { var e = document.getElementById("error"); e.style.display = "block"; e.textContent = msg; } else console.log(msg); },
+      };
+      var script = document.createElement("script");
+      script.src = "Build/Web.loader.js";
+      script.onload = function () {
+        createUnityInstance(canvas, config, function (p) { document.getElementById("fill").style.width = (100 * p) + "%"; })
+          .then(function () { document.getElementById("loading").style.display = "none"; canvas.focus(); })
+          .catch(function (message) { var e = document.getElementById("error"); e.style.display = "block"; e.textContent = message; });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>
